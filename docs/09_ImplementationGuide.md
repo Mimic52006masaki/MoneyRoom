@@ -28,56 +28,76 @@
 ### 3.1 ダッシュボード
 
 #### 実装対象
-- View：兄弟一覧、総所持金表示
-- ViewModel：Users Repositoryを呼び出して残高を計算
+- View：`src/app/dashboard/page.tsx`
+- ViewModel：`useApp` Context
 
 #### 主な処理
-- 各ユーザーの残高取得
-- 総所持金計算
-- 個人画面への遷移
+- `useApp` から users を取得
+- `calculateTotalBalance()` で総所持金計算
+- 各ユーザーカードに個人画面への Link
 
 #### 注意点
-- データが変更されるとリアルタイムで更新
+- Tailwind CSS でレスポンシブグリッドレイアウト
+- Firestore のリアルタイム更新で自動反映
 
 ---
 
 ### 3.2 個人画面
 
 #### 実装対象
-- View：支出履歴リスト、入力フォーム
-- ViewModel：Transactions Repositoryを呼び出す
+- View：`src/app/user/[id]/page.tsx`
+- ViewModel：`useApp` Context
 
 #### 主な処理
-- 支出/入金の追加・削除・編集
-- 所持金残高の自動更新
+- `useParams` でユーザー ID 取得
+- `addTransaction` で取引追加
+- `updateUser` で貯金目標更新
+- `deleteTransaction` で取引削除
 
 #### 注意点
-- 編集・削除時の残高整合性を保つ
+- 取引追加時に残高自動更新
+- 貯金目標は個人画面に統合
 
 ---
 
 ### 3.3 割り振り管理画面
 
 #### 実装対象
-- View：兄弟一覧・入力フォーム
-- ViewModel：Allocations Repositoryを呼び出す
+- View：`src/app/allocation/page.tsx`
+- ViewModel：`useApp` Context
 
 #### 主な処理
-- 割り振り金額入力
-- 各ユーザーの残高自動更新
-- 履歴保存
+- `allocateMoney` で割り振り実行
+- 残高チェックとエラーハンドリング
+
+#### 注意点
+- 割り振り時に送り元/送り先の残高更新
 
 ---
 
-### 3.4 貯金目標画面
+### 3.4 データ永続化層
 
-#### 実装対象
-- View：目標金額入力、達成度ゲージ
-- ViewModel：Users Repository更新
+#### Repository パターン
+- `repositories/UserRepository.ts`
+- `repositories/TransactionRepository.ts`
+- `repositories/AllocationRepository.ts`
+
+#### 主な機能
+- Firestore CRUD 操作
+- リアルタイムリスナー (`subscribeToAll`, `subscribeToUser`)
+
+---
+
+### 3.5 状態管理
+
+#### AppContext
+- `contexts/AppContext.tsx`
+- 全画面で `useApp` フック使用
 
 #### 主な処理
-- 貯金目標の更新
-- 達成度計算（残高 ÷ 目標額）
+- 取引追加時の残高更新
+- 割り振り実行
+- ビジネスロジック統合
 
 ---
 

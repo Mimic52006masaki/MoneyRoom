@@ -1,19 +1,25 @@
 # 技術スタック
 
 ## フロントエンド
-- React + Tailwind CSS
-- 状態管理: React Context or Zustand（※仮定）
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- 状態管理: React Context
 
 ## バックエンド
 - Firebase Firestore (リアルタイムDB)
-- Firebase Functions（必要に応じて）
 
 ## データベース
 - Firestore（NoSQL）
 
 ## インフラ
 - Vercel (デプロイ)
-- Firebase Hosting（静的ファイルホスティング）
 
 ## 認証・認可
 - 未実装（ログインなし、家庭内利用前提）
+
+## 開発ツール
+- Jest (テスト)
+- PostCSS (CSS 処理)
+- Turbopack (Next.js ビルドツール)
