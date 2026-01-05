@@ -5,9 +5,10 @@ import { useState } from 'react'
 import { useApp } from '@/contexts/AppContext'
 
 export default function Dashboard() {
-  const { users, calculateTotalBalance, addUser } = useApp()
+  const { users, addUser, addTransaction, updateUser, deleteUser } = useApp()
   const [newUserName, setNewUserName] = useState('')
   const [newUserBalance, setNewUserBalance] = useState('')
+  const [totalAllowance, setTotalAllowance] = useState('')
 
   const handleAddUser = async () => {
     if (!newUserName.trim() || parseInt(newUserBalance) < 0) return
@@ -21,28 +22,49 @@ export default function Dashboard() {
     setNewUserBalance('')
   }
 
+  const handleDistributeAllowance = async () => {
+    const total = parseInt(totalAllowance) || 0
+    const sumAllocations = users.reduce((sum, user) => sum + (user.allowance ?? 0), 0)
+    if (sumAllocations > total) {
+      alert('割り振り合計が総小遣い金額を超えています')
+      return
+    }
+
+    for (const user of users) {
+      const amount = user.allowance ?? 0
+      if (amount > 0) {
+        await addTransaction({
+          userId: user.id,
+          type: 'income',
+          amount,
+          item: '小遣い配分'
+        })
+      }
+    }
+    setTotalAllowance('')
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-2xl font-bold mb-4">ダッシュボード</h1>
-      <div className="bg-white p-4 rounded shadow mb-4">
-        <h2 className="text-xl font-semibold">総所持金: ¥{calculateTotalBalance().toLocaleString()}</h2>
-      </div>
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-2">新しいアカウント追加</h3>
-        <div className="flex items-center space-x-2">
+      <h1 className="text-3xl font-bold mb-6 text-center">お小遣い管理</h1>
+
+      {/* 新規ユーザー追加 */}
+      <div className="mb-6 bg-white p-4 rounded shadow">
+        <h2 className="text-xl font-semibold mb-3">新しい友だちを追加</h2>
+        <div className="flex flex-col md:flex-row items-center gap-2">
           <input
             type="text"
-            placeholder="ユーザー名"
+            placeholder="名前"
             value={newUserName}
             onChange={(e) => setNewUserName(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded flex-1"
           />
           <input
             type="number"
-            placeholder="初期残高"
+            placeholder="初めのお小遣い"
             value={newUserBalance}
             onChange={(e) => setNewUserBalance(e.target.value)}
-            className="border p-2 rounded w-24"
+            className="border p-2 rounded w-32"
             min="0"
           />
           <button
@@ -53,22 +75,89 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+
+      {/* 総小遣い配分 */}
+      <div className="mb-6 bg-yellow-100 p-4 rounded shadow">
+        <h2 className="text-xl font-semibold mb-3">みんなのお小遣いを分ける</h2>
+
+        {/* 総小遣い入力とボタンを同じ行 */}
+        <div className="flex flex-col md:flex-row items-center gap-2 mb-4">
+          <input
+            type="number"
+            placeholder="全部でいくら？"
+            value={totalAllowance}
+            onChange={(e) => setTotalAllowance(e.target.value)}
+            className="border p-2 rounded w-48"
+            min="0"
+          />
+          <button
+            onClick={handleDistributeAllowance}
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+          >
+            分ける
+          </button>
+        </div>
+
+        {/* 各ユーザー割り振り */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {users.map((user) => (
+            <div key={user.id} className="flex items-center gap-2">
+              <span className="w-32">{user.name}</span>
+              <input
+                type="number"
+                placeholder="いくら分ける？"
+                value={user.allowance ?? 0}
+                onChange={async (e) => {
+                  const value = parseInt(e.target.value) || 0
+                  await updateUser(user.id, { allowance: value })
+                }}
+                className="border p-2 rounded w-24"
+                min="0"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ユーザーカード */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {users.map(user => (
-          <div key={user.id} className="bg-white p-4 rounded shadow">
-            <h3 className="text-lg font-semibold">{user.name}</h3>
-            <p className="text-gray-600">残高: ¥{user.balance.toLocaleString()}</p>
-            <p className="text-gray-600">貯金目標: ¥{user.savingsGoal.toLocaleString()}</p>
+          <div key={user.id} className="bg-white p-4 rounded shadow relative">
+            <label className="block font-semibold mb-1">名前</label>
+            <input
+              type="text"
+              value={user.name}
+              onChange={(e) => updateUser(user.id, { name: e.target.value })}
+              className="border-b w-full mb-2 text-lg"
+            />
+
+            <label className="block font-semibold mb-1">今のお小遣い</label>
+            <input
+              type="number"
+              value={user.balance}
+              onChange={(e) => updateUser(user.id, { balance: parseInt(e.target.value) || 0 })}
+              className="border-b w-full mb-2 text-gray-600"
+            />
+
+            <label className="block font-semibold mb-1">貯めたい金額</label>
+            <input
+              type="number"
+              value={user.savingsGoal}
+              onChange={(e) => updateUser(user.id, { savingsGoal: parseInt(e.target.value) || 0 })}
+              className="border-b w-full mb-2 text-gray-600"
+            />
+
+            <button
+              onClick={() => deleteUser(user.id)}
+              className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+            >
+              削除
+            </button>
             <Link href={`/user/${user.id}`} className="text-blue-500 hover:underline block mt-2">
-              個人画面へ
+              もっと詳しく見る
             </Link>
           </div>
         ))}
-      </div>
-      <div className="mt-4">
-        <Link href="/allocation" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          割り振り管理
-        </Link>
       </div>
     </div>
   )

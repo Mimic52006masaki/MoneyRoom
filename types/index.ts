@@ -5,6 +5,7 @@ export interface User {
   savingsGoal: number
   role: 'child' | 'manager'
   createdAt?: Date
+  allowance?: number
 }
 
 export interface Transaction {
@@ -13,7 +14,6 @@ export interface Transaction {
   type: 'income' | 'expense'
   amount: number
   item: string
-  category: string
   createdAt?: Date
 }
 
