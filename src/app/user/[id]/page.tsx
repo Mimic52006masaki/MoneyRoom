@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useApp } from '@/contexts/AppContext'
 
 export default function UserPage() {
@@ -40,6 +41,11 @@ export default function UserPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      <div className="mb-4">
+        <Link href="/dashboard" className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+          ← ダッシュボードに戻る
+        </Link>
+      </div>
       <h1 className="text-2xl font-bold mb-4">{user.name}の個人画面</h1>
       <div className="bg-white p-4 rounded shadow mb-4">
         <p className="text-xl">残高: ¥{user.balance.toLocaleString()}</p>
