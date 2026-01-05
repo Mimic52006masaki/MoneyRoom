@@ -4,7 +4,7 @@ export interface User {
   balance: number
   savingsGoal: number
   role: 'child' | 'manager'
-  createdAt: Date
+  createdAt?: Date
 }
 
 export interface Transaction {

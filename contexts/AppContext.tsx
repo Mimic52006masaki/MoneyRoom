@@ -15,6 +15,7 @@ interface AppContextType {
   deleteTransaction: (id: string) => Promise<void>
   addAllocation: (allocation: Omit<Allocation, 'id'>) => Promise<void>
   updateUser: (id: string, updates: Partial<User>) => Promise<void>
+  addUser: (user: Omit<User, 'id'>) => Promise<void>
   // ビジネスロジック
   calculateTotalBalance: () => number
   allocateMoney: (fromUserId: string, toUserId: string, amount: number) => Promise<void>
@@ -93,6 +94,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     await userRepo.update(id, updates)
   }
 
+  const addUser = async (user: Omit<User, 'id'>) => {
+    await userRepo.create(user)
+  }
+
   const calculateTotalBalance = () => {
     return users.reduce((total, user) => total + user.balance, 0)
   }
@@ -116,6 +121,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       deleteTransaction,
       addAllocation,
       updateUser,
+      addUser,
       calculateTotalBalance,
       allocateMoney,
     }}>
