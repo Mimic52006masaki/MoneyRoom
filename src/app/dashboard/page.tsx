@@ -49,69 +49,81 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold mb-6 text-center">お小遣い管理</h1>
 
       {/* 新規ユーザー追加 */}
-      <div className="mb-6 bg-white p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-3">新しい友だちを追加</h2>
-        <div className="flex flex-col md:flex-row items-center gap-2">
-          <input
-            type="text"
-            placeholder="名前"
-            value={newUserName}
-            onChange={(e) => setNewUserName(e.target.value)}
-            className="border p-2 rounded flex-1"
-          />
-          <input
-            type="number"
-            placeholder="初めのお小遣い"
-            value={newUserBalance}
-            onChange={(e) => setNewUserBalance(e.target.value)}
-            className="border p-2 rounded w-32"
-            min="0"
-          />
-          <button
-            onClick={handleAddUser}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          >
-            追加
-          </button>
+      <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          
+          新しい友だちを追加
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div className="md:col-span-7">
+            <label className="sr-only">名前</label>
+            <input
+              type="text"
+              placeholder="名前"
+              value={newUserName}
+              onChange={(e) => setNewUserName(e.target.value)}
+              className="w-full rounded-md border-gray-500 bg-white text-gray-900 p-2 focus:border-primary focus:ring-primary"
+            />
+          </div>
+          <div className="md:col-span-3">
+            <label className="sr-only">初めのお小遣い</label>
+            <input
+              type="number"
+              placeholder="初めのお小遣い"
+              value={newUserBalance}
+              onChange={(e) => setNewUserBalance(e.target.value)}
+              className="w-full rounded-md border-gray-400 bg-white text-gray-900 p-2 focus:border-primary focus:ring-primary"
+              min="0"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <button
+              onClick={handleAddUser}
+              className="w-full bg-emerald-500 text-white font-medium py-2.5 rounded-md shadow-sm hover:bg-emerald-600 flex justify-center items-center gap-1"
+            >
+              追加
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 総小遣い配分 */}
-      <div className="mb-6 bg-yellow-100 p-4 rounded shadow">
-        <h2 className="text-xl font-semibold mb-3">みんなのお小遣いを分ける</h2>
-
-        {/* 総小遣い入力とボタンを同じ行 */}
-        <div className="flex flex-col md:flex-row items-center gap-2 mb-4">
-          <input
-            type="number"
-            placeholder="全部でいくら？"
-            value={totalAllowance}
-            onChange={(e) => setTotalAllowance(e.target.value)}
-            className="border p-2 rounded w-48"
-            min="0"
-          />
-          <button
-            onClick={handleDistributeAllowance}
-            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-          >
-            分ける
-          </button>
+      <div className="mb-6 bg-yellow-50 rounded-lg border border-yellow-100 p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <h2 className="text-lg font-bold flex items-center gap-2">
+            
+            みんなのお小遣いを分ける
+          </h2>
+          <div className="flex gap-2 w-full md:w-auto">
+            <input
+              type="number"
+              placeholder="全部でいくら？"
+              value={totalAllowance}
+              onChange={(e) => setTotalAllowance(e.target.value)}
+              className="flex-1 md:w-48 rounded-md border-yellow-200 bg-white p-2 focus:border-yellow-500 focus:ring-yellow-500"
+              min="0"
+            />
+            <button
+              onClick={handleDistributeAllowance}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium px-6 py-2 rounded-md shadow-sm"
+            >
+              分ける
+            </button>
+          </div>
         </div>
 
-        {/* 各ユーザー割り振り */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {users.map((user) => (
-            <div key={user.id} className="flex items-center gap-2">
-              <span className="w-32">{user.name}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {users.map(user => (
+            <div key={user.id} className="flex items-center gap-3 bg-white/50 p-3 rounded-md border border-yellow-100">
+              <label className="text-sm font-medium min-w-[4rem]">{user.name}</label>
               <input
                 type="number"
-                placeholder="いくら分ける？"
                 value={user.allowance ?? 0}
                 onChange={async (e) => {
                   const value = parseInt(e.target.value) || 0
                   await updateUser(user.id, { allowance: value })
                 }}
-                className="border p-2 rounded w-24"
+                className="w-full rounded border-gray-300 bg-white text-right p-1 focus:border-yellow-500 focus:ring-yellow-500 text-sm h-9"
                 min="0"
               />
             </div>
@@ -120,42 +132,38 @@ export default function Dashboard() {
       </div>
 
       {/* ユーザーカード */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {users.map(user => (
-          <div key={user.id} className="bg-white p-4 rounded shadow relative">
-            <label className="block font-semibold mb-1">名前</label>
-            <input
-              type="text"
-              value={user.name}
-              onChange={(e) => updateUser(user.id, { name: e.target.value })}
-              className="border-b w-full mb-2 text-lg"
-            />
-
-            <label className="block font-semibold mb-1">今のお小遣い</label>
-            <input
-              type="number"
-              value={user.balance}
-              onChange={(e) => updateUser(user.id, { balance: parseInt(e.target.value) || 0 })}
-              className="border-b w-full mb-2 text-gray-600"
-            />
-
-            <label className="block font-semibold mb-1">貯めたい金額</label>
-            <input
-              type="number"
-              value={user.savingsGoal}
-              onChange={(e) => updateUser(user.id, { savingsGoal: parseInt(e.target.value) || 0 })}
-              className="border-b w-full mb-2 text-gray-600"
-            />
-
-            <button
-              onClick={() => deleteUser(user.id)}
-              className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-            >
-              削除
-            </button>
-            <Link href={`/user/${user.id}`} className="text-blue-500 hover:underline block mt-2">
-              もっと詳しく見る
-            </Link>
+          <div key={user.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+            <div className="p-5 border-b flex justify-between items-start">
+              <div>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">名前</span>
+                <h3 className="text-xl font-bold mt-1">{user.name}</h3>
+              </div>
+              <button
+                onClick={() => deleteUser(user.id)}
+                className="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1"
+              >
+                削除
+              </button>
+            </div>
+            <div className="p-5 space-y-4 flex-1">
+              <div>
+                <div className="text-xs text-gray-500 mb-1">今のお小遣い</div>
+                <div className="text-2xl font-bold">{user.balance} <span className="text-sm text-gray-500">円</span></div>
+              </div>
+              <div className="w-full bg-gray-200 h-px"></div>
+              <div>
+                <div className="text-xs text-gray-500 mb-1">貯めたい金額</div>
+                <div className="text-2xl font-bold">{user.savingsGoal} <span className="text-sm text-gray-500">円</span></div>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 border-t">
+              <Link href={`/user/${user.id}`} className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1">
+                もっと詳しく見る
+                
+              </Link>
+            </div>
           </div>
         ))}
       </div>

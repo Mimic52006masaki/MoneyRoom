@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+@layer base {
+  * {
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-primary { color: #10B981; }
+  .bg-primary { background-color: #10B981; }
+  .border-primary { border-color: #10B981; }
+  .ring-primary { --tw-ring-color: #10B981; }
+}
